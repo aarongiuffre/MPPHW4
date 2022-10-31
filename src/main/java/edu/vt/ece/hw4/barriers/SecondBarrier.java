@@ -10,8 +10,9 @@ public class SecondBarrier implements Barrier {
     private final Counter counter;
     private int threadCount;
     private AtomicIntegerArray b;
-    private long fooTime;
-    private long barTime;
+    private long fooTime = System.currentTimeMillis() + 1000000000;
+    private long barTime = 0;
+    private long diff = 0;
     public SecondBarrier(Counter barrierCounter, int threadCount) {
         this.counter = barrierCounter;
         this.threadCount = threadCount;
@@ -77,19 +78,27 @@ public class SecondBarrier implements Barrier {
             }
             b.set(threadNum, 2);
             bar();
+            diff = barTime - fooTime;
+            System.out.println(diff);
         }
     }
 
     @Override
     public void foo() {
         //System.out.println("FOO!");
-        fooTime = System.currentTimeMillis();
+        long temp = System.currentTimeMillis();
+        if (temp < fooTime){ //min
+            fooTime = temp;
+        }
     }
 
     @Override
     public void bar() {
         //System.out.println("BAR!");
         barTime = System.currentTimeMillis();
-
+        long temp = System.currentTimeMillis();
+        if (temp > barTime){ //min
+            barTime = temp;
+        }
     }
 }
